@@ -69,4 +69,25 @@ app.patch(
     }
   );
 
+  /* get */
+  app.get(
+    "/",
+    (req: Request, res: Response) => {
+        res.send(todoRepository);
+    }
+  );
+
+/* get :/id */
+app.get(
+    "/:id",
+    (req: Request, res: Response) => {
+      const todo = todoRepository.find(el => el.id === parseInt(req.params.id));
+      if (!todo) {
+        res.status(400).send({ message: "ID not exist" });
+      } else {
+          res.send(todo);
+      }
+    }
+);
+
 app.listen(8000, () => console.log("Server running"));
