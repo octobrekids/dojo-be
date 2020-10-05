@@ -12,9 +12,8 @@ interface todo {
   complete: boolean;
 }[];
 
-let todoRepository: todo[];
-
-todoRepository = [];
+let todoRepository: todo[] = [];
+let number = 0;
 
 /* post */
 
@@ -23,8 +22,9 @@ app.post(
   [check("text").isString(), check("complete").isBoolean()],
   (req: Request, res: Response) => {
     const errors = validationResult(req);
+    number =  number + 1
     const todo = {
-      id: todoRepository.length + 1,
+      id: number,
       text: req.body.text,
       complete: req.body.complete,
     };
