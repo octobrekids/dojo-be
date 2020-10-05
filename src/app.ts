@@ -2,15 +2,15 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import * as bodyParser from "body-parser";
 import { check, validationResult } from "express-validator";
 
-const app: Application = express();
+const app = express();
 
 app.use(bodyParser.json());
 
-interface todo {
+type todo = {
   id: number;
   text: string;
   complete: boolean;
-}[];
+};
 
 let todoRepository: todo[] = [];
 let number = 0;
@@ -42,13 +42,14 @@ app.post(
 app.patch(
     "/:id",
     (req: Request, res: Response) => {
-      const todo = todoRepository.find(el => el.id === parseInt(req.params.id));
-      if (!todo) {
+      const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
+      if (!validTodo) {
         res.status(400).send({ message: "ID not exists" });
       } else {
-          todo.text = req.body.text ? req.body.text : todo.text 
-          todo.complete = req.body.complete ? req.body.complete : todo.complete 
-          res.send(todo);
+          validTodo.text = req.body.text ? req.body.text : validTodo.text 
+          validTodo.complete = req.body.complete ? req.body.complete : validTodo.complete 
+          todoRepository.push(validTodo);
+          res.send(validTodo);
       }
     }
   );
@@ -58,13 +59,13 @@ app.patch(
   app.delete(
     "/:id",
     (req: Request, res: Response) => {
-      const todo = todoRepository.find(el => el.id === parseInt(req.params.id));
-      if (!todo) {
+      const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
+      if (!validTodo) {
         res.status(400).send({ message: "ID not exist" });
       } else {
-          const index = todoRepository.indexOf(todo);
+          const index = todoRepository.indexOf(validTodo);
           todoRepository.splice(index, 1);
-          res.send(todo);
+          res.send(validTodo);
       }
     }
   );
@@ -81,11 +82,11 @@ app.patch(
 app.get(
     "/:id",
     (req: Request, res: Response) => {
-      const todo = todoRepository.find(el => el.id === parseInt(req.params.id));
-      if (!todo) {
+      const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
+      if (!validTodo) {
         res.status(400).send({ message: "ID not exist" });
       } else {
-          res.send(todo);
+          res.send(validTodo);
       }
     }
 );
