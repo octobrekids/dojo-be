@@ -1,4 +1,4 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import { check, validationResult } from "express-validator";
 
@@ -48,7 +48,6 @@ app.patch(
       } else {
           validTodo.text = req.body.text ? req.body.text : validTodo.text 
           validTodo.complete = req.body.complete ? req.body.complete : validTodo.complete 
-          todoRepository.push(validTodo);
           res.send(validTodo);
       }
     }
