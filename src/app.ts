@@ -26,7 +26,6 @@ type todo = {
   complete: boolean;
 };
 
-let todoRepository: todo[] = [];
 let number = 0;
 
 /* create todo */
