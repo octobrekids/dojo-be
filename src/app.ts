@@ -49,8 +49,8 @@ app.patch(
       if (!validTodo) {
         res.status(400).send({ message: "ID not exists" });
       } else {
-          validTodo.text = text ? text : validTodo.text 
-          validTodo.complete = complete ? complete : validTodo.complete 
+          validTodo.text = text || validTodo.text
+          validTodo.complete = complete || validTodo.complete
           res.send(validTodo);
       }
     }
