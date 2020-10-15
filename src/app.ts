@@ -24,10 +24,11 @@ app.post(
   (req: Request, res: Response) => {
     const errors = validationResult(req);
     number =  number + 1
+    const {text, complete} = req.body
     const todo = {
       id: number,
-      text: req.body.text,
-      complete: req.body.complete,
+      text: text,
+      complete: complete,
     };
     if (!errors.isEmpty()) {
       res.status(400).send({ message: "Bad request, Please check your input field" });
@@ -43,12 +44,13 @@ app.post(
 app.patch(
     "/:id",
     (req: Request, res: Response) => {
+      const {text, complete} = req.body
       const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
       if (!validTodo) {
         res.status(400).send({ message: "ID not exists" });
       } else {
-          validTodo.text = req.body.text ? req.body.text : validTodo.text 
-          validTodo.complete = req.body.complete ? req.body.complete : validTodo.complete 
+          validTodo.text = text ? text : validTodo.text 
+          validTodo.complete = complete ? complete : validTodo.complete 
           res.send(validTodo);
       }
     }
