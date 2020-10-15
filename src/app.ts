@@ -2,10 +2,23 @@ import express from "express";
 import * as bodyParser from "body-parser";
 import { validationResult } from "express-validator";
 import validation from "../middlewares/validator.middleware";
+import couchbase from 'couchbase'
 
 const app = express();
 
 app.use(bodyParser.json());
+
+/* define cluster */ 
+const cluster = new couchbase.Cluster("couchbase://localhost", {
+  username: "admin",
+  password: "123456",
+});
+
+/* define bucket */ 
+const bucket = cluster.bucket("TodoRepository");
+
+/* define collection */ 
+const collection = bucket.defaultCollection();
 
 type todo = {
   id: number;
@@ -86,7 +99,7 @@ app.get(
 
       if (!validTodo) return res.status(400).send({ message: "ID not exist" });
 
-      res.send(validTodo);
+      res.send(validTodo);      
     }
 );
 
