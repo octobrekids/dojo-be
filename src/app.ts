@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import { check, validationResult } from "express-validator";
+import validation from "../middlewares/validator.middleware";
 
 const app = express();
 
@@ -19,7 +20,7 @@ let number = 0;
 
 app.post(
   "/",
-  [check("text").isString(), check("complete").isBoolean()],
+  validation,
   (req: Request, res: Response) => {
     const errors = validationResult(req);
     number =  number + 1
