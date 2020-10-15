@@ -1,6 +1,6 @@
 import express from "express";
 import * as bodyParser from "body-parser";
-import { validationResult } from "express-validator";
+import { Result, validationResult } from "express-validator";
 import validation from "../middlewares/validator.middleware";
 import couchbase from "couchbase";
 import { errors } from "couchbase";
@@ -82,6 +82,25 @@ const deleteTodoId = async (key: string) => {
   }
 };
 
+const queryAllTodo = async () => {
+  const query = `
+  SELECT *
+  FROM TodoRepository
+`;
+
+try {
+  let data = await cluster.query(query)
+
+  const results = data.rows.map((row: object) => {
+    console.log('Query row: ', row)
+    return row
+  })
+  return results
+} catch (error) {
+  console.error('Query failed: ', error)
+}
+}
+
 
 /* post */
 
@@ -138,12 +157,13 @@ app.delete(
 );
 
 /* get */
-// app.get(
-//   "/",
-//   (req, res) => {
-//       res.send(todoRepository);
-//   }
-// );
+app.get(
+  "/",
+  async (req, res) => {
+      const result =  await queryAllTodo()
+      res.send(result);
+  }
+);
 
 /* get :/id */
 app.get("/:id", async (req, res) => {
