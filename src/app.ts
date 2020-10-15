@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import * as bodyParser from "body-parser";
 import { validationResult } from "express-validator";
 import validation from "../middlewares/validator.middleware";
