@@ -3,6 +3,7 @@ import * as bodyParser from "body-parser";
 import { validationResult } from "express-validator";
 import validation from "../middlewares/validator.middleware";
 import couchbase from 'couchbase'
+import { errors } from "couchbase";
 
 const app = express();
 
@@ -36,10 +37,25 @@ const createTodo = async (doc: todo) => {
     const result = await collection.insert(key, doc);
     console.log("Insert Result: ");
     console.log(result);
+    
+  } catch (error) {
+    console.error(error);
+
+  }
+};
+
+/* get todo with id */
+const getTodoId = async (key: string) => {
+  try {
+    const result = await collection.get(key);
+    console.log("Get Id" + key + " Result: ");
+    console.log(result);
+    return result;
   } catch (error) {
     console.error(error);
   }
 };
+
 
 
 /* post */
@@ -61,59 +77,61 @@ app.post(
 
     if (!errors.isEmpty()) return res.status(400).send({ message: "Bad request, Please check your input field" });
 
-    createTodo(todo);
+    await createTodo(todo);
     res.send(todo);
   }
 );
 
 /* patch */
 
-app.patch(
-    "/:id",
-    (req, res) => {
-      const {text, complete} = req.body
-      const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
+// app.patch(
+//     "/:id",
+//     (req, res) => {
+//       const {text, complete} = req.body
+//       const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
 
-      if (!validTodo) return res.status(400).send({ message: "ID not exists" });
+//       if (!validTodo) return res.status(400).send({ message: "ID not exists" });
 
-      validTodo.text = text || validTodo.text
-      validTodo.complete = complete || validTodo.complete
-      res.send(validTodo);  
-    }
-  );
+//       validTodo.text = text || validTodo.text
+//       validTodo.complete = complete || validTodo.complete
+//       res.send(validTodo);  
+//     }
+//   );
 
   /* delete */
   
-  app.delete(
-    "/:id",
-    (req, res) => {
-      const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
+  // app.delete(
+  //   "/:id",
+  //   (req, res) => {
+  //     const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
 
-      if (!validTodo) return res.status(400).send({ message: "ID not exist" });
+  //     if (!validTodo) return res.status(400).send({ message: "ID not exist" });
 
-      const index = todoRepository.indexOf(validTodo);
-      todoRepository.splice(index, 1);
-      res.send(validTodo);
-    }
-  );
+  //     const index = todoRepository.indexOf(validTodo);
+  //     todoRepository.splice(index, 1);
+  //     res.send(validTodo);
+  //   }
+  // );
 
   /* get */
-  app.get(
-    "/",
-    (req, res) => {
-        res.send(todoRepository);
-    }
-  );
+  // app.get(
+  //   "/",
+  //   (req, res) => {
+  //       res.send(todoRepository);
+  //   }
+  // );
 
 /* get :/id */
 app.get(
     "/:id",
-    (req, res) => {
-      const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
+    async (req, res) => {
 
-      if (!validTodo) return res.status(400).send({ message: "ID not exist" });
+      //if (!validTodo) return res.status(400).send({ message: "ID not exist" });
 
-      res.send(validTodo);      
+      const result = await getTodoId(req.params.id);
+      if(!result) return res.status(400).send({ message: "ID not exist" });
+      console.log(result);
+      res.send(result);      
     }
 );
 
