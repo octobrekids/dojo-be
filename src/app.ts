@@ -21,7 +21,7 @@ let number = 0;
 app.post(
   "/",
   validation,
-  (req: Request, res: Response) => {
+  (req, res) => {
     const errors = validationResult(req);
     number =  number + 1
 
@@ -43,7 +43,7 @@ app.post(
 
 app.patch(
     "/:id",
-    (req: Request, res: Response) => {
+    (req, res) => {
       const {text, complete} = req.body
       const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
 
@@ -59,7 +59,7 @@ app.patch(
   
   app.delete(
     "/:id",
-    (req: Request, res: Response) => {
+    (req, res) => {
       const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
 
       if (!validTodo) return res.status(400).send({ message: "ID not exist" });
@@ -73,7 +73,7 @@ app.patch(
   /* get */
   app.get(
     "/",
-    (req: Request, res: Response) => {
+    (req, res) => {
         res.send(todoRepository);
     }
   );
@@ -81,9 +81,9 @@ app.patch(
 /* get :/id */
 app.get(
     "/:id",
-    (req: Request, res: Response) => {
+    (req, res) => {
       const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
-      
+
       if (!validTodo) return res.status(400).send({ message: "ID not exist" });
 
       res.send(validTodo);
