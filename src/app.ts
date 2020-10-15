@@ -69,6 +69,19 @@ const updateTodoId = async (key: string, doc: todo) => {
   }
 };
 
+/* delete todo by id */
+const deleteTodoId = async (key: string) => {
+  try {
+    const result = await collection.mutateIn(key,[
+      couchbase.MutateInSpec.replace("exist",false),
+    ]);
+    console.log("Delete Id" + key + " Result: ");
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
 /* post */
 
@@ -113,18 +126,16 @@ app.patch(
 
 /* delete */
 
-// app.delete(
-//   "/:id",
-//   (req, res) => {
-//     const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
+app.delete(
+  "/:id",
+  async (req, res) => {
+    const validTodo = await getTodoId(req.params.id)
+    if (!validTodo) return res.status(400).send({ message: "ID not exists" });
 
-//     if (!validTodo) return res.status(400).send({ message: "ID not exist" });
-
-//     const index = todoRepository.indexOf(validTodo);
-//     todoRepository.splice(index, 1);
-//     res.send(validTodo);
-//   }
-// );
+    await deleteTodoId(req.params.id)
+    res.send(validTodo);
+  }
+);
 
 /* get */
 // app.get(
