@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import * as bodyParser from "body-parser";
-import { check, validationResult } from "express-validator";
+import { validationResult } from "express-validator";
 import validation from "../middlewares/validator.middleware";
 
 const app = express();
