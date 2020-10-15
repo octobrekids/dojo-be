@@ -61,7 +61,6 @@ const updateTodoId = async (key: string, doc: todo) => {
     const result = await collection.mutateIn(key,[
       couchbase.MutateInSpec.replace("text",doc.text),
       couchbase.MutateInSpec.replace("complete",doc.complete),
-      couchbase.MutateInSpec.replace("exist",doc.exist),
     ]);
     console.log("Update Id" + key + " Result: ");
     console.log(result);
@@ -99,14 +98,13 @@ app.post("/", validation, async (req, res) => {
 app.patch(
     "/:id",
     async (req, res) => {
-      const {text, complete, exist} = req.body
+      const {text, complete} = req.body
 
       const validTodo = await getTodoId(req.params.id)
       if (!validTodo) return res.status(400).send({ message: "ID not exists" });
 
       validTodo.content.text = text || validTodo.text
       validTodo.content.complete = complete || validTodo.complete
-      validTodo.content.exist = exist || validTodo.exist
       
        await updateTodoId(req.params.id,validTodo)
        res.send(validTodo);
