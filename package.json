@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/octobrekids/dojo-be#readme",
   "dependencies": {
+    "couchbase": "^3.0.6",
     "express": "^4.17.1",
     "express-validator": "^6.6.1"
   },
