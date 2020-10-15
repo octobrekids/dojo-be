@@ -55,6 +55,20 @@ const getTodoId = async (key: string) => {
   }
 };
 
+/* update todo by id */
+const updateTodoId = async (key: string, doc: todo) => {
+  try {
+    const result = await collection.mutateIn(key,[
+      couchbase.MutateInSpec.replace("text",doc.text),
+      couchbase.MutateInSpec.replace("complete",doc.complete),
+      couchbase.MutateInSpec.replace("exist",doc.exist),
+    ]);
+    console.log("Update Id" + key + " Result: ");
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 
 /* post */
@@ -82,19 +96,21 @@ app.post("/", validation, async (req, res) => {
 
 /* patch */
 
-// app.patch(
-//     "/:id",
-//     (req, res) => {
-//       const {text, complete} = req.body
-//       const validTodo = todoRepository.find(el => el.id === parseInt(req.params.id));
+app.patch(
+    "/:id",
+    async (req, res) => {
+      const {text, complete} = req.body
 
-//       if (!validTodo) return res.status(400).send({ message: "ID not exists" });
+      const validTodo = await getTodoId(req.params.id)
+      if (!validTodo) return res.status(400).send({ message: "ID not exists" });
 
-//       validTodo.text = text || validTodo.text
-//       validTodo.complete = complete || validTodo.complete
-//       res.send(validTodo);
-//     }
-//   );
+      validTodo.content.text = text || validTodo.text
+      validTodo.content.complete = complete || validTodo.complete
+      
+       await updateTodoId(req.params.id,validTodo)
+       res.send(validTodo);
+    }
+  );
 
 /* delete */
 
