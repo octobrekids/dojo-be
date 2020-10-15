@@ -29,12 +29,26 @@ type todo = {
 let todoRepository: todo[] = [];
 let number = 0;
 
+/* create todo */
+
+const createTodo = async (doc: todo) => {
+  try {
+    const key = `${doc.id}`;
+    const result = await collection.insert(key, doc);
+    console.log("Insert Result: ");
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
 /* post */
 
 app.post(
   "/",
   validation,
-  (req, res) => {
+  async (req, res) => {
     const errors = validationResult(req);
     number =  number + 1
 
@@ -43,11 +57,12 @@ app.post(
       id: number,
       text: text,
       complete: complete,
+      exist: true,
     };
 
     if (!errors.isEmpty()) return res.status(400).send({ message: "Bad request, Please check your input field" });
 
-    todoRepository.push(todo);
+    createTodo(todo);
     res.send(todo);
   }
 );
