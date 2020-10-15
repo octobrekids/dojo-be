@@ -81,6 +81,7 @@ const deleteTodoId = async (key: string) => {
   }
 };
 
+/* query all todo */
 const queryAllTodo = async () => {
   const query = `
   SELECT *
@@ -99,6 +100,20 @@ const queryAllTodo = async () => {
     console.error("Query failed: ", error);
   }
 };
+
+/* search todo */
+const ftsMatchPhrase = async (phase: any) => {
+    try {
+      return await cluster.searchQuery(
+        "text",
+        couchbase.SearchQuery.matchPhrase(phase),
+        { limit: 10 }
+      )
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
 
 /* post */
 
@@ -148,9 +163,12 @@ app.delete("/:id", async (req, res) => {
   res.send(validTodo);
 });
 
-/* get */
-app.get("/", async (req, res) => {
-  const result = await queryAllTodo();
+/* get search query */
+app.get("/search", async (req, res) => {
+  const data = await ftsMatchPhrase(req.query.q)
+  if(data.rows.length === 0) return res.status(400).send({ message: "ID not exists" });
+  const result = data.rows.map((e:any) => {return e})
+  console.log(result);
   res.send(result);
 });
 
@@ -162,4 +180,14 @@ app.get("/:id", async (req, res) => {
   res.send(result);
 });
 
+/* get */
+app.get("/", async (req, res) => {
+  const result = await queryAllTodo();
+  res.send(result);
+});
+
 app.listen(8000, () => console.log("Server running"));
+
+
+
+
