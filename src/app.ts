@@ -3,7 +3,6 @@ import * as bodyParser from "body-parser";
 import { Result, validationResult } from "express-validator";
 import validation from "../middlewares/validator.middleware";
 import couchbase from "couchbase";
-import { errors } from "couchbase";
 
 const app = express();
 
@@ -58,9 +57,9 @@ const getTodoId = async (key: string) => {
 /* update todo by id */
 const updateTodoId = async (key: string, doc: todo) => {
   try {
-    const result = await collection.mutateIn(key,[
-      couchbase.MutateInSpec.replace("text",doc.text),
-      couchbase.MutateInSpec.replace("complete",doc.complete),
+    const result = await collection.mutateIn(key, [
+      couchbase.MutateInSpec.replace("text", doc.text),
+      couchbase.MutateInSpec.replace("complete", doc.complete),
     ]);
     console.log("Update Id" + key + " Result: ");
     console.log(result);
@@ -72,8 +71,8 @@ const updateTodoId = async (key: string, doc: todo) => {
 /* delete todo by id */
 const deleteTodoId = async (key: string) => {
   try {
-    const result = await collection.mutateIn(key,[
-      couchbase.MutateInSpec.replace("exist",false),
+    const result = await collection.mutateIn(key, [
+      couchbase.MutateInSpec.replace("exist", false),
     ]);
     console.log("Delete Id" + key + " Result: ");
     console.log(result);
@@ -88,19 +87,18 @@ const queryAllTodo = async () => {
   FROM TodoRepository
 `;
 
-try {
-  let data = await cluster.query(query)
+  try {
+    let data = await cluster.query(query);
 
-  const results = data.rows.map((row: object) => {
-    console.log('Query row: ', row)
-    return row
-  })
-  return results
-} catch (error) {
-  console.error('Query failed: ', error)
-}
-}
-
+    const results = data.rows.map((row: object) => {
+      console.log("Query row: ", row);
+      return row;
+    });
+    return results;
+  } catch (error) {
+    console.error("Query failed: ", error);
+  }
+};
 
 /* post */
 
@@ -127,43 +125,34 @@ app.post("/", validation, async (req, res) => {
 
 /* patch */
 
-app.patch(
-    "/:id",
-    async (req, res) => {
-      const {text, complete} = req.body
+app.patch("/:id", async (req, res) => {
+  const { text, complete } = req.body;
 
-      const validTodo = await getTodoId(req.params.id)
-      if (!validTodo) return res.status(400).send({ message: "ID not exists" });
+  const validTodo = await getTodoId(req.params.id);
+  if (!validTodo) return res.status(400).send({ message: "ID not exists" });
 
-      validTodo.content.text = text || validTodo.text
-      validTodo.content.complete = complete || validTodo.complete
-      
-       await updateTodoId(req.params.id,validTodo)
-       res.send(validTodo);
-    }
-  );
+  validTodo.content.text = text || validTodo.text;
+  validTodo.content.complete = complete || validTodo.complete;
+
+  await updateTodoId(req.params.id, validTodo);
+  res.send(validTodo);
+});
 
 /* delete */
 
-app.delete(
-  "/:id",
-  async (req, res) => {
-    const validTodo = await getTodoId(req.params.id)
-    if (!validTodo) return res.status(400).send({ message: "ID not exists" });
+app.delete("/:id", async (req, res) => {
+  const validTodo = await getTodoId(req.params.id);
+  if (!validTodo) return res.status(400).send({ message: "ID not exists" });
 
-    await deleteTodoId(req.params.id)
-    res.send(validTodo);
-  }
-);
+  await deleteTodoId(req.params.id);
+  res.send(validTodo);
+});
 
 /* get */
-app.get(
-  "/",
-  async (req, res) => {
-      const result =  await queryAllTodo()
-      res.send(result);
-  }
-);
+app.get("/", async (req, res) => {
+  const result = await queryAllTodo();
+  res.send(result);
+});
 
 /* get :/id */
 app.get("/:id", async (req, res) => {
